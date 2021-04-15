@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta property="og:title" content="My Vocabulary Notebook"/>
+        <meta property="og:description" content="Toy_Project_02"/>
+        <meta property="og:image" content="{{ url_for('static', filename='logo.png') }}"/>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
+        <link rel="icon" href="{{ url_for('static', filename='logo.png') }}" type="image/x-icon">
+        <title> My Vocabulary Notebook</title>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+                integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+                crossorigin="anonymous"></script>
+        <!-- Fontawesome -->
+        <script src="https://kit.fontawesome.com/00575364b9.js" crossorigin="anonymous"></script>
+
+        <script>
+            {%  if msg %}
+                alert('{{ msg }}')
+            {% endif %}
+            let words = {{ words|tojson }};
+            let words_list = [];
+            for (let i=0; i<words.length; i++) {
+                words_list.push(words[i]['word'])
+            }
+            function find_word() {
+                let word = $('#input-word').val().toLowerCase()
+                if (word=="") {
+                    alert('값을 입력해주세요.')
+                    return
+                }
+                if (words_list.includes(word)) {
+                    // 리스트에 있으면 하이라이트
+                    $(`#word-${word}`).addClass('highlight')
+                    $(`#word-${word}`).siblings().removeClass('highlight')
+                    $(`#word-${word}`)[0].scrollIntoView()
+                } else {
+                    // 리스트에 없으면 새 단어를 위한 상세 페이지로 이동
+                    window.location.href = `detail/${word}?status_give=new`
+                }
+            }
+        </script>
+
+    </head>
+    <body>
+        <div class="wrap">
+        <div class="banner-box">
+            <div class="banner" onclick="window.location.href = '/'"> </div>
+        </div>
+            <div class="search-box d-flex justify-content-center">
+                <input id="input-word" class="form-control" style="margin-right: 0.5rem">
+                <button class="btn btn-light" onclick="find_word()"><i class="fa fa-search"></i></button>
+            </div>
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col" style="width:30%">WORD</th>
+                        <th scope="col">MEANING</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-box">
+                    {% for word in words %}
+                        <tr id="word-{{ word.word }}">
+                            <td>
+                                <a href="/detail/{{ word.word }}?status_give=old">{{ word.word }}</a>
+                            </td>
+                            <td>
+                                {{ word.definition }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
